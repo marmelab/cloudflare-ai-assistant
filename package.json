@@ -12,13 +12,18 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
+    "@cloudflare/ai": "^1.1.0",
     "nuxt": "^3.11.2",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240502.0",
+    "@nuxt/types": "^2.17.3",
+    "@nuxt/typescript-build": "^3.0.2",
     "nitro-cloudflare-dev": "^0.1.4",
+    "typescript": "^5.4.5",
     "wrangler": "^3.53.1"
   }
 }
