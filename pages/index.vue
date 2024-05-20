@@ -11,7 +11,6 @@ useHead({
   meta: [{ name: "description", content: "A demo AI assistant" }],
 });
 
-const assistantInput = ref<HTMLTextAreaElement | null>(null);
 const promptInput = ref<HTMLTextAreaElement | null>(null);
 const submitButton = ref<HTMLButtonElement | null>(null);
 
@@ -60,12 +59,7 @@ textarea.result {
 
 <template>
   <form @submit="onSubmit">
-    <textarea
-      class="result"
-      ref="assistantInput"
-      :disabled="loading"
-      v-model="generatedText"
-    />
+    <textarea class="result" :disabled="loading" v-model="generatedText" />
     <label>
       Enter your prompt
       <textarea
