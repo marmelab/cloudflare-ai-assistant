@@ -13,8 +13,10 @@ useHead({
 
 const prompt = ref<string>("");
 const submitButton = ref<HTMLButtonElement | null>(null);
+const messagesContainer = ref<HTMLDivElement | null>(null);
 
-const { loading, sendPrompt } = usePrompt();
+const isSubmitDisabled = ref<boolean>(true);
+const { loading, sendPrompt, messages } = usePrompt();
 
 function submit() {
   submitButton.value?.click?.();
@@ -38,6 +40,14 @@ async function onSubmit(event: Event) {
 
   prompt.value = "";
 }
+
+watch(messages, () => {
+  nextTick(() => {
+    if (messagesContainer.value) {
+      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+    }
+  });
+});
 </script>
 
 <template data-theme="cupcake">
@@ -48,38 +58,44 @@ async function onSubmit(event: Event) {
         <span class="text-xs ml-2">Powered by Marmelab</span>
       </div>
     </header>
-    <div class="flex-1 overflow-y-auto p-4 space-y-4">
-      <BotMessage>BOT</BotMessage>
-      <SenderMessage>TOTO</SenderMessage>
-      <SenderMessage>TOTO</SenderMessage>
+    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
+      <div v-for="(message, index) in messages" :key="index">
+        <BotMessage
+          v-if="message.role === 'assistant'"
+          :content="message.content"
+        />
+        <SenderMessage
+          v-else-if="message.role === 'user'"
+          :content="message.content"
+        />
+      </div>
     </div>
-    <form
-      @submit="onSubmit"
-      class="bg-gray-100 dark:bg-gray-950 p-4 flex items-center"
-    >
-      <textarea
-        class="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 p-2 mr-2 flex-grow"
-        placeholder="Type your message..."
-        v-model="prompt"
-        @keydown.meta.enter="submit"
-        @keydown.ctrl.enter="submit"
-        :disabled="loading"
-      />
+    <form @submit="onSubmit">
+      <div class="bg-gray-100 dark:bg-gray-950 p-4 flex items-center">
+        <textarea
+          class="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 p-2 mr-2 flex-grow"
+          placeholder="Type your message..."
+          v-model="prompt"
+          @keydown.meta.enter="submit"
+          @keydown.ctrl.enter="submit"
+          :disabled="loading"
+        />
 
-      <MicrophoneButton
-        v-if="!prompt"
-        v-bind:onRecordedText="handleVoiceRecorded"
-      />
-      <button
-        type="submit"
-        ref="submitButton"
-        class="btn btn-circle btn-primary"
-        :disabled="loading"
-        v-else
-      >
-        <span class="loading loading-spinner" v-if="loading" />
-        <SendIcon v-else />
-      </button>
+        <MicrophoneButton
+          v-if="!prompt"
+          v-bind:onRecordedText="handleVoiceRecorded"
+        />
+        <button
+          type="submit"
+          ref="submitButton"
+          class="btn btn-circle btn-primary"
+          :disabled="loading"
+          v-else
+        >
+          <span class="loading loading-spinner" v-if="loading" />
+          <SendIcon v-else />
+        </button>
+      </div>
     </form>
   </div>
 </template>
