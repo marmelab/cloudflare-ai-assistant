@@ -3,6 +3,8 @@
   "extends": "./.nuxt/tsconfig.json",
   "include": ["env.d.ts", ".nuxt/nuxt.d.ts", "**/*"],
   "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
     "moduleResolution": "Node16",
     "module": "Node16",
     "types": [

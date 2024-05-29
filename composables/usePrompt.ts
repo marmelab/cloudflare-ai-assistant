@@ -1,3 +1,5 @@
+import { ref } from "vue";
+
 type Prompt = {
   role: "user" | "assistant";
   content: string;
