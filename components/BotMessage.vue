@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  content: (text: string) => void;
+  content: string;
 }>();
 </script>
 
@@ -12,7 +12,7 @@ const props = defineProps<{
       </div>
     </div>
     <div class="bg-secondary dark:bg-gray-800 rounded-lg p-3">
-      <pre v-if="content">{{ content }}</pre>
+      <pre v-if="content">{{ props.content }}</pre>
       <div v-else>
         <div class="flex space-x-2 animate-pulse">
           <div class="w-1 h-1 bg-white rounded-full"></div>
