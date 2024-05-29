@@ -24,6 +24,7 @@ useHead({
 const prompt = ref<string>("");
 const submitButton = ref<HTMLButtonElement | null>(null);
 const messagesContainer = ref<HTMLDivElement | null>(null);
+const displayModeDirect = ref<boolean>(true);
 
 const isSubmitDisabled = ref<boolean>(true);
 const { loading, sendPrompt, messages } = usePrompt();
@@ -51,13 +52,21 @@ async function onSubmit(event: Event) {
   prompt.value = "";
 }
 
-watch(messages, () => {
+let lastAssistantMessage = ref(null);
+
+watch(messages, (newMessages) => {
   nextTick(() => {
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
     }
   });
+
+  lastAssistantMessage.value = newMessages.findLast(
+    (message) => message.role === "assistant"
+  );
 });
+
+console.log("lastAssistantMessage", lastAssistantMessage.value);
 </script>
 
 <template data-theme="cupcake">
@@ -67,18 +76,16 @@ watch(messages, () => {
         <h1 class="text-lg font-bold">AI Assistant</h1>
         <span class="text-xs ml-2">Powered by Marmelab</span>
       </div>
-      <div class="bg-white p-1 rounded-lg">
-        🧁
-        <div class="inline-block w-10">
-          <span
-            data-toggle-theme="cupcake,dracula"
-            data-act-class="pl-4"
-            class="border rounded-full border-primary flex items-center cursor-pointer w-10 transition-all duration-300 ease-in-out pl-0"
-          >
-            <span class="rounded-full w-3 h-3 m-1 bg-primary"> </span>
-          </span>
+      <div class="flex gap-2">
+        <div class="bg-white p-1 rounded-lg flex gap-2 items-center">
+          🙀
+          <input
+            type="checkbox"
+            class="toggle toggle-primary toggle-sm"
+            v-model="displayModeDirect"
+          />
+          💻
         </div>
-        🧛
       </div>
     </header>
     <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
@@ -99,7 +106,33 @@ watch(messages, () => {
           </p>
         </div>
       </div>
-      <div v-else v-for="(message, index) in messages" :key="index">
+      <div
+        v-if="displayModeDirect && messages.length > 0"
+        class="h-full container mx-auto"
+      >
+        <div
+          v-if="lastAssistantMessage?.content"
+          class="flex w-full h-full gap-2"
+        >
+          <div class="avatar placeholder">
+            <div class="bg-neutral text-neutral-content rounded-full w-6 h-6">
+              <span class="text-xs">A</span>
+            </div>
+          </div>
+          <pre>{{ lastAssistantMessage?.content }}</pre>
+        </div>
+        <div v-else class="flex items-center justify-center h-full">
+          <span
+            className="justify-center loading loading-dots loading-lg"
+          ></span>
+        </div>
+      </div>
+      <div
+        v-else
+        v-for="(message, index) in messages"
+        :key="index"
+        class="container mx-auto"
+      >
         <BotMessage
           v-if="message.role === 'assistant'"
           :content="message.content"
