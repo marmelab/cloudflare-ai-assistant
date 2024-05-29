@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { watch } from "vue";
 import useRecorder from "~/composables/useRecorder.js";
 
 const props = defineProps<{
@@ -47,13 +47,9 @@ const handleContextMenu = (e: MouseEvent | TouchEvent) => {
     @touchup="handleMouseUp"
     :disabled="microphoneDisabled"
     type="button"
+    :class="`btn btn-circle ${recording ? 'btn-success' : 'btn-primary'}`"
   >
-    {{
-      loading
-        ? "Transcribing audio"
-        : recording
-        ? "Listening for prompts"
-        : "Voice"
-    }}
+    <span class="loading loading-spinner" v-if="loading" />
+    <MicrophoneIcon v-else />
   </button>
 </template>
