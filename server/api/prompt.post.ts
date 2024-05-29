@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
 
   const ai = new Ai(cloudflareBindings.AI);
 
-  const stream = await ai.run("@cf/meta/llama-3-8b-instruct" as any, {
+  const stream = await ai.run("@cf/meta/llama-3-8b-instruct", {
     messages: [
       {
         role: ROLE_SYSTEM,

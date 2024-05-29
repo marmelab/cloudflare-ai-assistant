@@ -1,9 +1,4 @@
 <script setup lang="ts">
-type Prompt = {
-  role: "user" | "assistant";
-  content: string;
-};
-
 import { ref } from "vue";
 
 useHead({
@@ -25,6 +20,13 @@ function submit() {
   submitButton.value?.click?.();
 }
 
+function handleAudioPrompt(prompt: string) {
+  if (promptInput.value) {
+    promptInput.value.value = prompt;
+    handleKeyUp();
+  }
+}
+
 async function onSubmit(event: Event) {
   event.preventDefault();
 
@@ -37,10 +39,10 @@ async function onSubmit(event: Event) {
   const prompt = formData.get("prompt");
   if (promptInput.value) {
     promptInput.value.value = "";
+    handleKeyUp();
   }
 
   if (typeof prompt !== "string") {
-    // TODO: handle error
     return;
   }
   sendPrompt(prompt);
@@ -72,6 +74,9 @@ textarea.result {
         @keydown.ctrl.enter="submit"
       />
     </label>
+
+    <Microphone v-bind:onPrompt="handleAudioPrompt" />
+
     <button
       type="submit"
       ref="submitButton"
