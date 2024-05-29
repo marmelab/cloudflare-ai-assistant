@@ -4,29 +4,17 @@ type Prompt = {
 };
 
 export default function usePrompt() {
-  // internal
-  const messages = ref<Prompt[]>([]);
-
   // public API
+  const messages = ref<Prompt[]>([]);
   const loading = ref<boolean>(false);
-  const generatedText = ref<string>("");
 
   function sendPrompt(prompt: string) {
     const trimedPrompt = prompt.trim();
-    if (!trimedPrompt) {
+    if (!trimedPrompt || loading.value) {
       // TODO: handle error
       return;
     }
 
-    if (generatedText.value) {
-      messages.value = [
-        ...messages.value,
-        {
-          role: "assistant",
-          content: generatedText,
-        },
-      ];
-    }
     messages.value = [
       ...messages.value,
       {
@@ -36,6 +24,15 @@ export default function usePrompt() {
     ];
 
     loading.value = true;
+
+    const currentMessages = [...messages.value];
+    messages.value = [
+      ...messages.value,
+      {
+        role: "assistant",
+        content: "",
+      },
+    ];
 
     fetch("/api/prompt", {
       method: "POST",
@@ -51,7 +48,9 @@ export default function usePrompt() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
 
-        let text = "";
+
+
+        let content = "";
         while (true) {
           const { done, value } = await reader?.read();
           const str = decoder.decode(value);
@@ -66,13 +65,20 @@ export default function usePrompt() {
 
           try {
             const { response } = JSON.parse(str.slice(6));
-            text += response;
+            content += response;
 
-            generatedText.value = text;
+            messages.value = [
+              ...currentMessages,
+              {
+                role: "assistant",
+                content,
+              },
+            ];
           } catch (e) {
             console.warn("Failed to parse JSON message", e);
           }
         }
+
       })
       .finally(function () {
         loading.value = false;
@@ -81,7 +87,7 @@ export default function usePrompt() {
 
   return {
     loading,
-    generatedText,
+    messages,
     sendPrompt,
   };
 }
