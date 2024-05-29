@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  content: (text: string) => void;
+  content: string;
 }>();
 </script>
 
@@ -9,7 +9,7 @@ const props = defineProps<{
   <div class="flex items-center justify-end gap-2">
     <div class="bg-primary text-white rounded-lg p-3">
       <p>
-        {{ content }}
+        {{ props.content }}
       </p>
     </div>
     <div class="avatar placeholder">

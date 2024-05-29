@@ -48,33 +48,41 @@ export default function usePrompt() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
 
-        let content = "";
+        let responseBody = "";
         while (true) {
           const { done, value } = await reader?.read();
-          const str = decoder.decode(value);
 
-          if (done || !str || str.trim().endsWith("[DONE]")) {
+          if (done) {
             break;
           }
 
-          if (!str.startsWith("data: ")) {
-            continue;
-          }
+          responseBody += decoder.decode(value);
 
-          try {
-            const { response } = JSON.parse(str.slice(6));
-            content += response;
+          const content = responseBody
+            .split("data:")
+            .map((part) => {
+              const json = part.trim();
+              if (!json || json === "[DONE]") {
+                return null;
+              }
 
-            messages.value = [
-              ...currentMessages,
-              {
-                role: "assistant",
-                content,
-              },
-            ];
-          } catch (e) {
-            console.warn(`Failed to parse JSON message: '${str}'`, e);
-          }
+              try {
+                const { response } = JSON.parse(json) as { response: string };
+                return response;
+              } catch {
+                return null;
+              }
+            })
+            .filter((part) => part !== null)
+            .join("");
+
+          messages.value = [
+            ...currentMessages,
+            {
+              role: "assistant",
+              content,
+            },
+          ];
         }
       })
       .finally(function () {
