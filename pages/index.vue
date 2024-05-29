@@ -15,7 +15,7 @@ const promptInput = ref<HTMLTextAreaElement | null>(null);
 const submitButton = ref<HTMLButtonElement | null>(null);
 
 const isSubmitDisabled = ref<boolean>(true);
-const { loading, sendPrompt } = usePrompt();
+const { loading, sendPrompt, messages } = usePrompt();
 
 function handleKeyUp() {
   isSubmitDisabled.value = !promptInput?.value?.value?.trim?.();
@@ -52,6 +52,7 @@ async function onSubmit(event: Event) {
   }
   sendPrompt(prompt);
 }
+console.log("messages", messages);
 </script>
 
 
@@ -64,18 +65,37 @@ async function onSubmit(event: Event) {
       </div>
     </header>
     <div class="flex-1 overflow-y-auto p-4 space-y-4">
-      <BotMessage>BOT</BotMessage>
-      <SenderMessage>TOTO</SenderMessage>
-      <SenderMessage>TOTO</SenderMessage>
+      <div v-for="(message, index) in messages" :key="index">
+        <BotMessage
+          v-if="message.role === 'assistant'"
+          :content="message.content"
+        />
+        <SenderMessage
+          v-else-if="message.role === 'user'"
+          :content="message.content"
+        />
+      </div>
     </div>
-    <div class="bg-gray-100 dark:bg-gray-950 p-4 flex items-center">
-      <textarea
-        class="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 p-2 mr-2"
-        placeholder="Type your message..."
-      />
-      <button>
-        <span class="sr-only">Send</span>
-      </button>
-    </div>
+    <form @submit="onSubmit">
+      <div class="bg-gray-100 dark:bg-gray-950 p-4 flex items-center">
+        <textarea
+          class="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 p-2 mr-2"
+          rows="2"
+          name="prompt"
+          ref="promptInput"
+          @keyup="handleKeyUp"
+          @keypress="handleKeyUp"
+          @keydown.meta.enter="submit"
+          @keydown.ctrl.enter="submit"
+        />
+        <button
+          type="submit"
+          ref="submitButton"
+          :disabled="isSubmitDisabled || loading"
+        >
+          Generate
+        </button>
+      </div>
+    </form>
   </div>
 </template>
