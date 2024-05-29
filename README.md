@@ -7,6 +7,7 @@ Make sure to install the dependencies:
 ```bash
 # npm
 npm install
+npx wrangler login
 ```
 
 ## Development Server
