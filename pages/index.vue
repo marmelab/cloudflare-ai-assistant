@@ -10,7 +10,8 @@ pre {
 
 <script setup lang="ts">
 import { themeChange } from "theme-change";
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import usePrompt from "../composables/usePrompt";
 
 onMounted(async () => {
   themeChange(false);
@@ -26,7 +27,6 @@ const submitButton = ref<HTMLButtonElement | null>(null);
 const messagesContainer = ref<HTMLDivElement | null>(null);
 const displayModeDirect = ref<boolean>(true);
 
-const isSubmitDisabled = ref<boolean>(true);
 const { loading, sendPrompt, messages } = usePrompt();
 
 function submit() {
@@ -52,7 +52,7 @@ async function onSubmit(event: Event) {
   prompt.value = "";
 }
 
-let lastAssistantMessage = ref(null);
+let lastAssistantMessage = ref<Prompt>(null);
 
 watch(messages, (newMessages) => {
   nextTick(() => {
@@ -65,8 +65,6 @@ watch(messages, (newMessages) => {
     (message) => message.role === "assistant"
   );
 });
-
-console.log("lastAssistantMessage", lastAssistantMessage.value);
 </script>
 
 <template data-theme="cupcake">

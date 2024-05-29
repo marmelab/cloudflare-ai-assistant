@@ -1,6 +1,6 @@
 import { ref } from "vue";
 
-type Prompt = {
+export type Prompt = {
   role: "user" | "assistant";
   content: string;
 };
