@@ -13,6 +13,7 @@ useHead({
 
 const prompt = ref<string>("");
 const submitButton = ref<HTMLButtonElement | null>(null);
+const messagesContainer = ref<HTMLDivElement | null>(null);
 
 const isSubmitDisabled = ref<boolean>(true);
 const { loading, sendPrompt, messages } = usePrompt();
@@ -39,7 +40,14 @@ async function onSubmit(event: Event) {
 
   prompt.value = "";
 }
-console.log("messages", messages);
+
+watch(messages, () => {
+  nextTick(() => {
+    if (messagesContainer.value) {
+      messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+    }
+  });
+});
 </script>
 
 <template data-theme="cupcake">
@@ -50,7 +58,7 @@ console.log("messages", messages);
         <span class="text-xs ml-2">Powered by Marmelab</span>
       </div>
     </header>
-    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
       <div v-for="(message, index) in messages" :key="index">
         <BotMessage
           v-if="message.role === 'assistant'"
