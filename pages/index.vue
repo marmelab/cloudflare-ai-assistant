@@ -52,14 +52,44 @@ watch(messages, () => {
 
 <template data-theme="cupcake">
   <div class="flex flex-col h-screen">
-    <header class="bg-accent text-white p-4 flex items-center">
+    <header class="bg-accent text-white p-4 flex items-center justify-between">
       <div class="flex items-center">
         <h1 class="text-lg font-bold">AI Assistant</h1>
         <span class="text-xs ml-2">Powered by Marmelab</span>
       </div>
+      <div class="bg-white p-1 rounded-lg">
+        🧁
+        <div class="inline-block w-10">
+          <span
+            data-toggle-theme="cupcake,dracula"
+            data-act-class="pl-4"
+            class="border rounded-full border-primary flex items-center cursor-pointer w-10 transition-all duration-300 ease-in-out pl-0"
+          >
+            <span class="rounded-full w-3 h-3 m-1 bg-primary"> </span>
+          </span>
+        </div>
+        🧛
+      </div>
     </header>
     <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
-      <div v-for="(message, index) in messages" :key="index">
+      <div
+        v-if="messages.length === 0"
+        class="flex items-center justify-center h-full"
+      >
+        <div
+          class="flex flex-col items-center border-2 border-gray-200 rounded-lg p-12 text-center"
+        >
+          <img
+            src="https://images.opencollective.com/marmelab/d7fd82f/logo/256.png"
+            alt="No messages yet"
+            width="40"
+          />
+          <p class="mt-4 text-lg font-semibold text-gray-700">
+            No messages yet. Start a conversation!
+          </p>
+        </div>
+      </div>
+      <div v-else v-for="(message, index) in messages" :key="index">
         <BotMessage
           v-if="message.role === 'assistant'"
           :content="message.content"
@@ -71,9 +101,9 @@ watch(messages, () => {
       </div>
     </div>
     <form @submit="onSubmit">
-      <div class="bg-gray-100 dark:bg-gray-950 p-4 flex items-center">
+      <div class="bg-gray-100 p-4 flex items-center">
         <textarea
-          class="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 p-2 mr-2 flex-grow"
+          class="flex-1 rounded-lg border border-gray-300 p-2 mr-2 flex-grow"
           placeholder="Type your message..."
           v-model="prompt"
           @keydown.meta.enter="submit"
