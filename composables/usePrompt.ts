@@ -8,7 +8,7 @@ export default function usePrompt() {
   const messages = ref<Prompt[]>([]);
   const loading = ref<boolean>(false);
 
-  function sendPrompt(prompt: string) {
+  async function sendPrompt(prompt: string) {
     const trimedPrompt = prompt.trim();
     if (!trimedPrompt || loading.value) {
       // TODO: handle error
@@ -34,7 +34,7 @@ export default function usePrompt() {
       },
     ];
 
-    fetch("/api/prompt", {
+    await fetch("/api/prompt", {
       method: "POST",
       headers: [["Content-Type", "application/json"]],
       body: JSON.stringify({ messages: messages.value }),
@@ -48,14 +48,12 @@ export default function usePrompt() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
 
-
-
         let content = "";
         while (true) {
           const { done, value } = await reader?.read();
           const str = decoder.decode(value);
 
-          if (done || str === "[DONE]") {
+          if (done || !str || str.trim().endsWith("[DONE]")) {
             break;
           }
 
@@ -75,10 +73,9 @@ export default function usePrompt() {
               },
             ];
           } catch (e) {
-            console.warn("Failed to parse JSON message", e);
+            console.warn(`Failed to parse JSON message: '${str}'`, e);
           }
         }
-
       })
       .finally(function () {
         loading.value = false;
