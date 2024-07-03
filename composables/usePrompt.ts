@@ -50,9 +50,13 @@ export default function usePrompt() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
 
+        if (!reader) {
+          return;
+        }
+
         let responseBody = "";
         while (true) {
-          const { done, value } = await reader?.read();
+          const { done, value } = await reader.read();
 
           if (done) {
             break;

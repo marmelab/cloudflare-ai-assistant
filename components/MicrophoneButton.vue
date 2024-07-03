@@ -23,12 +23,12 @@ watch(recordedText, (newRecordedText) => {
   props.onRecordedText(newRecordedText);
 });
 
-const handleMouseDown = (e: MouseEvent | TouchEvent) => {
+const handlePointerDown = (e: MouseEvent | TouchEvent) => {
   e.preventDefault();
   startRecording();
 };
 
-const handleMouseUp = (e: MouseEvent | TouchEvent) => {
+const handlePointerUp = (e: MouseEvent | TouchEvent) => {
   e.preventDefault();
   stopRecording();
 };
@@ -41,10 +41,8 @@ const handleContextMenu = (e: MouseEvent | TouchEvent) => {
 <template>
   <button
     @contextmenu="handleContextMenu"
-    @mousedown="handleMouseDown"
-    @mouseup="handleMouseUp"
-    @touchdown="handleMouseDown"
-    @touchup="handleMouseUp"
+    @pointerdown="handlePointerDown"
+    @pointerup="handlePointerUp"
     :disabled="microphoneDisabled"
     type="button"
     :class="`btn btn-circle ${recording ? 'btn-success' : 'btn-primary'}`"
